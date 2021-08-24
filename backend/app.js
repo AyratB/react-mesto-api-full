@@ -7,6 +7,8 @@ const { errors } = require('celebrate');
 const { celebrate, Joi } = require('celebrate');
 const NotFoundError = require('./errors/not_found_err');
 
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+
 const {
   login, createUser,
 } = require('./controllers/users');
@@ -30,6 +32,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(helmet());
 
+app.use(requestLogger);
+
 app.post('/signin', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -52,6 +56,8 @@ app.use('/cards', require('./routes/cards'));
 app.get('*', (req, res, next) => {
   next(new NotFoundError('Запрашиваемый ресурс не найден'));
 });
+
+app.use(errorLogger);
 
 app.use(errors());
 
