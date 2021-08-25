@@ -8,6 +8,7 @@ const { celebrate, Joi } = require('celebrate');
 const NotFoundError = require('./errors/not_found_err');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+const { corsHandler } = require('./middlewares/corsHandler');
 
 const {
   login, createUser,
@@ -33,6 +34,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(helmet());
 
 app.use(requestLogger);
+app.use(corsHandler);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
