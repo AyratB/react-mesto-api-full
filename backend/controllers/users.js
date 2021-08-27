@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const User = require('../models/user');
 
-const { JWT_SECRET = 'dev-key' } = process.env;
+const { JWT_SECRET, NODE_ENV } = process.env;
 
 const UncorrectDataError = require('../errors/uncorrect_data_err');
 const UnauthorizedError = require('../errors/unauthorized_err');
@@ -133,16 +133,21 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id },
-        JWT_SECRET,
-        { expiresIn: '7d' });
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+        { expiresIn: '7d' },
+      );
 
       res
         .cookie('jwt', token, {
           maxAge: 3600000 * 24 * 7,
           httpOnly: true,
         })
-        .send({ message: 'Логин прошел успешно' });
+        .send({
+          message: 'Логин прошел успешно',
+          token,
+        });
     })
     .catch((err) => next(new UnauthorizedError(err.message)));
 };

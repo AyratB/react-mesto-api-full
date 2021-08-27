@@ -1,12 +1,12 @@
 const allowedCors = [
   'https://mestopracticum.students.nomoredomains.club',
   'http://mestopracticum.students.nomoredomains.club',
-  'localhost:3000',
+  'http://localhost:3000',
 ];
 
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 
-function corsHandler (req, res, next) {
+function corsHandler(req, res, next) {
   const { origin } = req.headers;
   const { method } = req;
   const requestHeaders = req.headers['access-control-request-headers'];
@@ -18,6 +18,7 @@ function corsHandler (req, res, next) {
   if (method === 'OPTIONS') {
     res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
     res.header('Access-Control-Allow-Headers', requestHeaders);
+    res.end();
   }
 
   next();

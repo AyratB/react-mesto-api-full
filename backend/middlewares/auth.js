@@ -1,7 +1,7 @@
 const jsonwebtoken = require('jsonwebtoken');
 require('dotenv').config();
 
-const { JWT_SECRET = 'dev-key' } = process.env;
+const { JWT_SECRET, NODE_ENV } = process.env;
 
 const UnauthorizedError = require('../errors/unauthorized_err');
 const ForbiddenError = require('../errors/forbidden_err');
@@ -13,7 +13,7 @@ module.exports = (req, res, next) => {
     let payload;
 
     try {
-      payload = jsonwebtoken.verify(jwt, JWT_SECRET);
+      payload = jsonwebtoken.verify(jwt, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret');
     } catch (err) {
       next(new UnauthorizedError('Некорректный JWT-токен'));
     }
