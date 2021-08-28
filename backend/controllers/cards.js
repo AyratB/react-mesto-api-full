@@ -20,16 +20,15 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findById(req.user._id)
+  Card.findById(req.params.cardId)
     .orFail(new Error('NoValidid'))
     .then((card) => {
-      if (card.owner === req.user._id) {
-        Card.deleteOne(req.params.cardId)
-          .orFail(next(new NotFoundError('Карточка с указанным _id не найдена')))
-          .then((deletedCard) => res.status(200).send({ data: deletedCard }));
-      } else {
-        next(new ForbiddenError('Не совпадает автор карточки и id пользователя'));
-      }
+      if (!card) next(new NotFoundError('Карточка с указанным _id не найдена'));
+      if (card.owner !== req.user._id) next(new ForbiddenError('Не совпадает автор карточки и id пользователя'));
+
+      Card.deleteOne(req.params.cardId)
+        .orFail(next(new NotFoundError('Карточка с указанным _id не найдена')))
+        .then((deletedCard) => res.status(200).send({ data: deletedCard }));
     })
     .catch((err) => {
       if (err.message === 'NoValidid') {
