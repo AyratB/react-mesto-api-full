@@ -1,0 +1,41 @@
+.button_type_add-element{
+    width: 150px;
+    height: 50px;
+    border: 2px solid #FFFFFF;
+    border-radius: 2px;
+    background-color: black;
+    background-image: url("./../../../images/add-image.svg");
+    background-size: 22px 22px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.button_type_add-element:hover{
+    opacity: 0.6;
+}
+
+@media screen and (max-width:1023px){
+    .button_type_add-element{
+        width: 50%;
+        margin-top: 10px;
+    }
+}
+
+@media screen and (max-width: 767px){
+    .button_type_add-element{
+        width: 100%;
+        margin-top: 18px;
+    }
+}
+
+@media screen and (max-width: 424px){
+    .button_type_add-element{
+        margin-top: 24px;
+    }
+}
+
+@media screen and (max-width: 424px){
+    .button_type_add-element{
+        margin-top: 36px;
+    }
+}
