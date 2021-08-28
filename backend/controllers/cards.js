@@ -3,6 +3,7 @@ const Card = require('../models/card');
 const UncorrectDataError = require('../errors/uncorrect_data_err');
 const NotFoundError = require('../errors/not_found_err');
 const DefaultError = require('../errors/default-err');
+const ForbiddenError = require('../errors/forbidden_err');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -19,11 +20,17 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .where('owner').equals(req.user._id)
+  Card.findById(req.user._id)
     .orFail(new Error('NoValidid'))
-    .then((card) => res.status(200).send({ data: card }))
-
+    .then((card) => {
+      if (card.owner === req.user._id) {
+        Card.deleteOne(req.params.cardId)
+          .orFail(next(new NotFoundError('Карточка с указанным _id не найдена')))
+          .then((deletedCard) => res.status(200).send({ data: deletedCard }));
+      } else {
+        next(new ForbiddenError('Не совпадает автор карточки и id пользователя'));
+      }
+    })
     .catch((err) => {
       if (err.message === 'NoValidid') {
         next(new NotFoundError('Карточка с указанным _id не найдена'));
@@ -42,7 +49,7 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(new Error('NoValidid'))
-    .then((card) => res.status(200).send({ data: card }))
+    .then((likedCard) => res.status(200).send({ data: likedCard }))
     .catch((err) => {
       if (err.message === 'NoValidid') {
         next(new NotFoundError('Карточка с указанным _id не найдена'));
@@ -61,6 +68,7 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   )
     .orFail(new Error('NoValidid'))
+    .then((dislikedCard) => res.status(200).send({ data: dislikedCard }))
     .catch((err) => {
       if (err.message === 'NoValidid') {
         next(new NotFoundError('Карточка с указанным _id не найдена'));

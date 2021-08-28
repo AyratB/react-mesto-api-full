@@ -4,7 +4,6 @@ require('dotenv').config();
 const { JWT_SECRET, NODE_ENV } = process.env;
 
 const UnauthorizedError = require('../errors/unauthorized_err');
-const ForbiddenError = require('../errors/forbidden_err');
 
 module.exports = (req, res, next) => {
   const { jwt } = req.cookies;
@@ -22,6 +21,6 @@ module.exports = (req, res, next) => {
 
     next();
   } else {
-    next(new ForbiddenError('Доступ запрещен. Необходима авторизация'));
+    next(new UnauthorizedError('Доступ запрещен. Необходима авторизация'));
   }
 };

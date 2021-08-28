@@ -18,7 +18,7 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-  User.findById(req.user._id)
+  User.findById(req.params.userId)
     .orFail(new Error('NoValidid'))
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
@@ -56,26 +56,24 @@ module.exports.createUser = (req, res, next) => {
     password,
   } = req.body;
 
-  if (email && password) {
-    bcrypt.hash(password, 10)
-      .then((hash) => User.create({
-        name,
-        about,
-        avatar,
-        email,
-        password: hash,
-      }))
-      .then((user) => res.status(200).send({ data: user }))
-      .catch((err) => {
-        if (err.name === 'ValidationError') {
-          next(new UncorrectDataError('Переданы некорректные данные при создании пользователя'));
-        } else if (err.name === 'MongoError' && err.code === 11000) {
-          next(new ConflictRequestError('Попытка зарегистрироваться оп существующему email'));
-        } else {
-          next(new DefaultError('Ошибка по умолчанию'));
-        }
-      });
-  }
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
+    .then((user) => res.status(200).send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new UncorrectDataError('Переданы некорректные данные при создании пользователя'));
+      } else if (err.name === 'MongoError' && err.code === 11000) {
+        next(new ConflictRequestError('Попытка зарегистрироваться оп существующему email'));
+      } else {
+        next(new DefaultError('Ошибка по умолчанию'));
+      }
+    });
 };
 
 module.exports.updateUserData = (req, res, next) => {

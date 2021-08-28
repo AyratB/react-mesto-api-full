@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: (v) => /^https?:\/\/[www.]?[a-z0-9\D]{1,}\.[ru|net][a-z\D]{0,}#?/gi.test(v),
-      message: 'Некорректный адрес адреса аватара',
+      message: 'Некорректный адрес аватара',
     },
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
